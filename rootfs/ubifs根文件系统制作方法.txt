@@ -1,0 +1,24 @@
+1. mkfs.ubifs -r rootfs -m 2048 -e 126976 -c 240 -o ubifs.img
+2. ubinize -o ubi.img-m 2048 -p 128KiB-s 512 -O 2048 ubinize.cfg
+说明：-s 512 -O 2048必须加
+
+ubinize.cfg为一些配置参数：
+
+[ubifs]
+mode=ubi
+image=ubifs.img
+vol_id=0
+vol_size=30MiB
+vol_type=dynamic
+vol_alignment=1
+vol_name=rootfs
+vol_flags=autoresize
+
+linux烧写直接使用flashcp命令
+uboot 烧写nand write.i
+启动参数: Ubi.mtd=3 rootfstype=ubifs root=ubi0:rootfs
+U-Boot>  setenv mtdargs setenv bootargs ubi.mtd=3 rootfstype=ubifs root=ubi0:rootfs init=${init}
+
+遇到的问题：
+UBI error: vtbl_check: volume table check failed: record 0, error 9
+说明mtd分区不够大，需要把ubinize.cfg文件中的vol_size改小一点实验得出32MiB改为30MiB
